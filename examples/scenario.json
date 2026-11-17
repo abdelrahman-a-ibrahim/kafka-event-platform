@@ -1,0 +1,7 @@
+{
+  "event_id": "booking-event-001",
+  "event_type": "booking.created",
+  "schema_version": 1,
+  "partition_key": "session-demo-01",
+  "booking_id": "booking-synthetic-01"
+}
