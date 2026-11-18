@@ -1,52 +1,28 @@
-# Kafka Messaging Platform Lab
+# Kafka Event Platform
 
-**Operate an event backbone and explain its delivery guarantees**
+A Kafka-based messaging platform with versioned event contracts, access control and operational visibility.
 
-> Status: foundation only / implementation not started. Independent educational project by Abdelrahman Ahmed. This repository is not a reconstruction of employer systems, a production deployment or proof of completed work.
+**Status: In development** · Personal project by Abdelrahman Ahmed
 
-## The engineering challenge
+## Overview
 
-Build a Kafka platform for WorkshopHub booking and attendance events. Local single-node development is the first milestone; a separate multi-broker experiment explores resilience without pretending a laptop is production.
+An event backbone for applications that publish bookings, attendance updates and operational events. The project defines topic ownership, schema evolution, partitioning, consumer coordination and recovery procedures around explicit delivery guarantees.
 
-This is a capstone for an experienced engineer. The goal is to defend tradeoffs, investigate failure and produce reproducible evidence, not just get a happy-path demo running.
+## Current state
 
-**Technical focus:** Kafka · KRaft · Schemas · Consumer groups · ACLs · Monitoring.
+The repository currently contains the system design, delivery requirements, a synthetic input fixture and initial Python interfaces. Runtime behavior, service integrations and deployment are planned. Interface methods raise `NotImplementedError`; there is no running application or published runtime benchmark yet.
 
-## What exists in this first commit
+## Planned capabilities
 
-- A project-specific architecture brief and decision questions.
-- Five implementation milestones with explicit review gates.
-- Failure experiments and acceptance criteria.
-- Typed Python interface scaffolds. Methods deliberately raise `NotImplementedError`.
-- One synthetic scenario fixture; it is an input, not a successful output or benchmark.
-- Evidence and journal templates, an issue template, and syntax/JSON foundation checks.
+- A versioned topic catalog with ownership, retention and schema compatibility rules.
+- Reproducible Kafka KRaft deployment configurations.
+- Producer and consumer interfaces with explicit partition and offset semantics.
+- Scoped identities and ACLs for multi-broker deployments.
+- Consumer-lag visibility, broker health dashboards and recovery procedures.
 
-## What you will build
+Detailed scope is tracked in the [delivery roadmap](docs/roadmap.md) and [requirements](docs/requirements.md).
 
-1. Document a topic catalog, ownership, retention, partition keys, compatibility policy and delivery assumptions.
-2. Build a reproducible local KRaft environment with pinned image versions. Add topic creation as an explicit operation and a cleanup command.
-3. Implement producers and consumers. Explore keys, partitions, ordering, offset commits, poison messages and consumer rebalances.
-4. Run a separate multi-broker resilience lab. Specify replication factor, minimum in-sync replicas and producer acknowledgements; add scoped identities and ACLs.
-5. Instrument lag, produce latency, rebalances and broker health. Run load/recovery experiments and publish a capacity and operations report.
-
-## Start here
-
-1. Read [the architecture brief](docs/architecture.md) and record the first decision in [ADR 0001](docs/adr/0001-system-boundaries.md).
-2. Inspect [the synthetic scenario](examples/scenario.json) and [the interface boundary](src/kafka_messaging_platform_lab/interfaces.py).
-3. Run the foundation checks from the repository root:
-
-   ```sh
-   python3 tools/check_foundation.py
-   ```
-
-   Python 3.9+ is sufficient for these standard-library checks. They parse Python and JSON; they do **not** validate runtime behavior, deployment safety, protocol compliance or completion.
-4. Create a feature branch, implement milestone 1 and add behavior tests before adapters.
-5. Follow [the milestone backlog](docs/milestones.md). Select and pin implementation dependencies when you introduce them; none are installed by this scaffold.
-6. Complete [the failure lab](docs/failure-lab.md), gather [evidence](docs/evidence/README.md) and review [acceptance criteria](docs/acceptance.md).
-
-There is deliberately no `deploy`, `apply`, paid API call, installed cloud SDK or working runtime in this initial commit.
-
-## Architecture at a glance
+## Architecture
 
 ```text
 Synthetic producer -> Kafka topics -> independent consumer groups
@@ -54,68 +30,66 @@ Synthetic producer -> Kafka topics -> independent consumer groups
                          +-> metrics -> dashboard / alerts
 ```
 
-This is a proposed lab architecture. [The design brief](docs/architecture.md) identifies decisions still to make.
+This is the proposed component design. See [architecture](docs/architecture.md) for boundaries and [architecture decisions](docs/adr/0001-system-boundaries.md) for the choices still to resolve.
 
-## Learning prerequisites
+## Technology direction
 
-- `application-engineering-lab` (a suggested learning prerequisite; no runtime dependency is wired in)
+Kafka · KRaft · Schemas · Consumer groups · ACLs · Monitoring.
 
-Repositories are separate and can evolve independently. If you connect them later, exchange versioned fixtures or contracts; do not rely on sibling-relative imports. You can implement a standalone synthetic adapter first.
+These technologies describe the intended implementation. Dependencies and compatible versions will be pinned when introduced. Optional services are not required by the current source checks.
 
-## What makes this substantial
+## Working with the source
 
-- Partition-key selection and hot-key mitigation
-- Schema registry versus repository contracts
-- Offset commit relative to downstream side effects
+```sh
+git clone https://github.com/abdelrahman-a-ibrahim/kafka-event-platform.git
+cd kafka-event-platform
+python3 tools/check_project.py
+```
 
-You must explain what happens on retries, partial failure, concurrent operations and recovery. Record what your test environment cannot prove. No result is accepted simply because a dashboard is green.
+Python 3.9+ is sufficient for the current standard-library source check. It parses Python and JSON and checks required project files. It does **not** run an application, validate deployment behavior or establish feature completion.
 
-## Definition of done
+The initial application boundary is in [`src/kafka_event_platform/interfaces.py`](src/kafka_event_platform/interfaces.py). [`examples/scenario.json`](examples/scenario.json) provides a synthetic development input. Installation and runtime commands will be added with the first executable release.
+
+## Quality and reliability
 
 - A retained input set can be replayed with documented duplicate behavior.
 - Unauthorized producer/consumer operations fail in explicit ACL tests.
 - Broker-loss results include exact topology and durability settings.
 - Ordering guarantees are stated per partition; no unqualified exactly-once claim.
 
-Also supply installation/reproduction instructions, dependency versions, meaningful behavior tests, cleanup instructions, an architecture decision log and evidence from a repeatable demonstration. A checklist or syntax check alone does not satisfy completion.
+These are acceptance targets. Failure scenarios are specified in [reliability verification](docs/reliability.md); [results](docs/verification/README.md) will be recorded as implementation progresses. Correctness and performance claims must reference an actual environment, workload and commit.
 
-## Advanced extensions
+## Development roadmap
 
-- Kafka transactions inside a Kafka-to-Kafka workflow
-- Consumer-lag autoscaling experiment
-- Mirror or disaster-recovery topology comparison
-- Tiered retention cost and recovery tradeoffs
+- [ ] Contracts and system boundaries
+- [ ] Core implementation and behavior tests
+- [ ] External adapters and scoped access
+- [ ] Failure recovery and operational visibility
+- [ ] Reproducible deployment and release validation
 
-Extensions follow a working baseline; they are not requirements for the first milestone.
+See [delivery stages and future scope](docs/roadmap.md). For deployment prerequisites and resource lifecycle, see [operations](docs/operations.md).
 
-## Boundaries and costs
+## Repository structure
 
-Use fictional services, synthetic inputs and a disposable sandbox. Do not copy employer repositories, runbooks, tickets, customer data, credentials or internal architecture. Real cloud/provider adapters are future work and may incur costs; [the operations plan](docs/operations.md) must identify account, region, budget, resource inventory and teardown before deployment. Budget alerts notify; they do not constitute a hard spending cap.
+```text
+src/kafka_event_platform/       Initial application interfaces
+examples/                  Synthetic development inputs
+tests/                     Behavior verification plan
+docs/architecture.md       Component design and boundaries
+docs/requirements.md       Functional and quality requirements
+docs/roadmap.md            Delivery stages and future scope
+docs/reliability.md        Failure and recovery scenarios
+docs/operations.md         Runtime and deployment plan
+docs/verification/         Results as implementation progresses
+tools/check_project.py     Source integrity check
+```
 
-## Publishable evidence, when earned
+## Development
 
-A completed lab may support a portfolio case study labeled **independent project**. Share your original code, sanitized diagrams, measured results and a failure/recovery write-up. Employer experience and personal lab evidence remain separate. Never copy illustrative fixture values into a results claim.
+Use focused feature branches, add behavior tests with implementation changes and update the relevant architecture decision when guarantees change. Read [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Primary references
+This is an independent personal project. Examples use synthetic data. See [NOTICE.md](NOTICE.md) for licensing status.
+
+## References
 
 - https://kafka.apache.org/documentation/
-
-Read current official documentation when selecting SDKs, images, tool versions and integrations. The scaffold intentionally does not guess compatible version combinations.
-
-## Repository map
-
-- `src/kafka_messaging_platform_lab/interfaces.py`
-- `examples/scenario.json`
-- `docs/architecture.md`
-- `docs/milestones.md`
-- `docs/failure-lab.md`
-- `docs/acceptance.md`
-- `docs/learning-journal.md`
-- `docs/evidence/README.md`
-- `docs/operations.md` — local/cloud boundaries and teardown plan.
-- `docs/adr/` — decisions and alternatives.
-- `tools/check_foundation.py` — syntax and fixture integrity only.
-
-## Working agreement
-
-Keep commits focused: `docs`, `feat`, `test`, `fix`, `ops`. Work on a feature branch and merge only after the milestone review. Consult [CONTRIBUTING.md](CONTRIBUTING.md). No open-source license has been chosen yet; see [NOTICE.md](NOTICE.md).
